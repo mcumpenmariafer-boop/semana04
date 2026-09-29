@@ -1,0 +1,42 @@
+# docker-compose.yml — Sistema de Gestión de Encomiendas
+services:
+
+  # ── Base de datos PostgreSQL ─────────────────────────────────
+  db:
+    image: postgres:16
+    container_name: encomiendas_db
+    environment:
+      POSTGRES_DB: encomiendas_db
+      POSTGRES_USER: encomiendas_user
+      POSTGRES_PASSWORD: encomiendas_pass
+    ports:
+      - "5433:5432"          # 5433 en tu PC (el 5432 ya lo usa tu PostgreSQL local)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U encomiendas_user -d encomiendas_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Aplicación Django ────────────────────────────────────────
+  web:
+    build: .
+    container_name: encomiendas_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app               # los cambios en el código se ven al instante
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: encomiendas_db
+      DB_USER: encomiendas_user
+      DB_PASSWORD: encomiendas_pass
+      DB_HOST: db            # nombre del servicio de la base de datos
+      DB_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
