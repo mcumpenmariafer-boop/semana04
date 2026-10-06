@@ -15,10 +15,14 @@ from envios.models import Empleado, Encomienda, HistorialEstado
 from rutas.models import Ruta
 
 CLIENTES = [
-    ('70123456', 'Carlos', 'Ramírez Torres'), ('70234567', 'Ana', 'Flores Díaz'),
-    ('70345678', 'Luis', 'Mendoza Castro'), ('70456789', 'María', 'Quispe Huamán'),
-    ('70567890', 'Jorge', 'Vásquez Rojas'), ('70678901', 'Rosa', 'Chávez Paredes'),
-    ('70789012', 'Pedro', 'Sánchez Gómez'), ('70890123', 'Lucía', 'Torres Vega'),
+    ('70123456', 'Carlos', 'Ramírez Torres', 'Av. José Balta 1250, Chiclayo'),
+    ('70234567', 'Ana', 'Flores Díaz', 'Jr. Elías Aguirre 345, Chiclayo'),
+    ('70345678', 'Luis', 'Mendoza Castro', 'Av. Javier Prado Este 2450, San Borja, Lima'),
+    ('70456789', 'María', 'Quispe Huamán', 'Calle Los Pinos 128, Urb. California, Trujillo'),
+    ('70567890', 'Jorge', 'Vásquez Rojas', 'Av. Grau 760, Piura'),
+    ('70678901', 'Rosa', 'Chávez Paredes', 'Av. Arequipa 3520, San Isidro, Lima'),
+    ('70789012', 'Pedro', 'Sánchez Gómez', 'Calle Mercaderes 214, Cercado, Arequipa'),
+    ('70890123', 'Lucía', 'Torres Vega', 'Av. Luis Gonzales 980, Chiclayo'),
 ]
 RUTAS = [
     ('LIM-CIX', 'Lima', 'Chiclayo', '25.00', 2), ('CIX-LIM', 'Chiclayo', 'Lima', '25.00', 2),
@@ -36,10 +40,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         random.seed(4)
-        clientes = [Cliente.objects.get_or_create(
-            nro_doc=doc, defaults={'nombres': n, 'apellidos': a,
-                                   'telefono': f'9{doc[1:]}'})[0]
-            for doc, n, a in CLIENTES]
+        clientes = []
+        for doc, nombres, apellidos, direccion in CLIENTES:
+            cliente, _ = Cliente.objects.get_or_create(
+                nro_doc=doc, defaults={'nombres': nombres, 'apellidos': apellidos,
+                                       'telefono': f'9{doc[1:]}', 'direccion': direccion})
+            # Si el cliente ya existía sin dirección, se la agrega
+            if not cliente.direccion:
+                cliente.direccion = direccion
+                cliente.save(update_fields=['direccion'])
+            clientes.append(cliente)
         rutas = [Ruta.objects.get_or_create(
             codigo=c, defaults={'origen': o, 'destino': d,
                                 'precio_base': Decimal(p), 'dias_estimados': dias})[0]

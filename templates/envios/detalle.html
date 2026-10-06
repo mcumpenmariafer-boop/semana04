@@ -1,7 +1,7 @@
 {# templates/envios/detalle.html #}
 {% extends 'base.html' %}
 
-{% block title %}{{ encomienda.codigo }} — Detalle{% endblock %}
+{% block title %}{{ encomienda.codigo }} Detalle {% endblock %}
 
 {% block content %}
 <a href="{% url 'encomienda_lista' %}" class="volver"><i class="fas fa-chevron-left me-1"></i>Encomiendas</a>
@@ -62,8 +62,22 @@
                 </div>
 
                 <dl class="datos">
-                    <div><dt>Remitente</dt><dd>{{ encomienda.remitente.nombre_completo }}</dd></div>
-                    <div><dt>Destinatario</dt><dd>{{ encomienda.destinatario.nombre_completo }}</dd></div>
+                                        <div class="dato-medio">
+                        <dt>Remitente</dt>
+                        <dd>
+                            {{ encomienda.remitente.nombre_completo }}
+                            <span class="dato-extra"><i class="fas fa-location-dot"></i>{{ encomienda.remitente.direccion|default:'Sin dirección registrada' }}</span>
+                            {% if encomienda.remitente.telefono %}<span class="dato-extra"><i class="fas fa-phone"></i>{{ encomienda.remitente.telefono }}</span>{% endif %}
+                        </dd>
+                    </div>
+                    <div class="dato-medio">
+                        <dt>Destinatario</dt>
+                        <dd>
+                            {{ encomienda.destinatario.nombre_completo }}
+                            <span class="dato-extra"><i class="fas fa-location-dot"></i>{{ encomienda.destinatario.direccion|default:'Sin dirección registrada' }}</span>
+                            {% if encomienda.destinatario.telefono %}<span class="dato-extra"><i class="fas fa-phone"></i>{{ encomienda.destinatario.telefono }}</span>{% endif %}
+                        </dd>
+                    </div>
                     <div><dt>Peso</dt><dd>{{ encomienda.peso_kg|floatformat:1 }} kg</dd></div>
                     <div><dt>Volumen</dt><dd>{% if encomienda.volumen_cm3 %}{{ encomienda.volumen_cm3|floatformat:0 }} cm³{% else %}—{% endif %}</dd></div>
                     <div><dt>Costo del envío</dt><dd>S/ {{ encomienda.costo_envio|floatformat:2 }}</dd></div>

@@ -486,6 +486,18 @@ a.codigo:hover { border-color: var(--acento); color: var(--acento); }
 .datos dd { margin: 0; font-weight: 500; }
 .dato-ancho { grid-column: 1 / -1; }
 
+/* Remitente y destinatario ocupan media fila cada uno */
+@media (min-width: 576px) { .dato-medio { grid-column: span 2; } }
+.datos .dato-medio:nth-child(2) { grid-column: auto / -1; }
+.dato-extra {
+    display: block;
+    margin-top: .3rem;
+    font-weight: 400;
+    font-size: .85rem;
+    color: var(--texto-suave);
+}
+.dato-extra i { width: 1rem; margin-right: .35rem; color: #93a0b0; }
+
 .lista-datos { list-style: none; margin: 0; padding: 0; }
 .lista-datos li {
     display: flex;
