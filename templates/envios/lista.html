@@ -49,7 +49,7 @@
                     <td>{{ enc.ruta.origen }} → {{ enc.ruta.destino }}</td>
                     <td>
                         <span class="badge-estado badge-{{ enc.estado }}">{{ enc.get_estado_display }}</span>
-                        {% if enc.tiene_retraso %}<i class="fas fa-exclamation-triangle text-danger ms-1" data-bs-toggle="tooltip" title="Con retraso"></i>{% endif %}
+                        {% if enc.tiene_retraso %}<span class="tag-retraso">Retrasada</span>{% endif %}
                     </td>
                     <td>{{ enc.fecha_registro|date:'d/m/Y' }}</td>
                     <td><a href="{% url 'encomienda_detalle' enc.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>

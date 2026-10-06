@@ -1,6 +1,6 @@
 {# templates/navbar.html — menú según el estado de autenticación #}
 {% with url_actual=request.resolver_match.url_name %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-app">
     <div class="container">
         <a class="navbar-brand" href="{% url 'dashboard' %}">
             <i class="fas fa-shipping-fast me-2"></i>Encomiendas

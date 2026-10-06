@@ -60,10 +60,10 @@ class EncomiendaAdmin(admin.ModelAdmin):
     def estado_badge(self, obj):
         """Muestra el estado con color"""
         colores = {
-            'PE': '#6c757d',  # gris - pendiente
-            'TR': '#0d6efd',  # azul - en tránsito
-            'EN': '#198754',  # verde - entregado
-            'CA': '#dc3545',  # rojo - cancelado
+            'PE': '#b45309',  # ámbar - pendiente
+            'TR': '#1d4ed8',  # azul - en tránsito
+            'EN': '#047857',  # verde - entregado
+            'CA': '#b91c1c',  # rojo - cancelado
         }
         color = colores.get(obj.estado, '#6c757d')
         return format_html(
