@@ -1,55 +1,66 @@
-{# templates/navbar.html — menú según el estado de autenticación #}
+{# templates/navbar.html — menú lateral (en celular se abre con el botón de la barra superior) #}
 {% with url_actual=request.resolver_match.url_name %}
-<nav class="navbar navbar-expand-lg navbar-dark navbar-app">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'dashboard' %}">
-            <i class="fas fa-shipping-fast me-2"></i>Encomiendas
+
+{# Barra superior: solo visible en pantallas pequeñas #}
+<header class="topbar-movil d-lg-none">
+    <button class="btn btn-icono" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-label="Abrir menú">
+        <i class="fas fa-bars"></i>
+    </button>
+    <a class="marca" href="{% url 'dashboard' %}">
+        <span class="marca-logo"><i class="fas fa-box"></i></span> Encomiendas
+    </a>
+</header>
+
+{# Menú lateral #}
+<aside class="offcanvas-lg offcanvas-start menu-lateral" tabindex="-1" id="menuLateral">
+    <div class="menu-cabecera">
+        <a class="marca" href="{% url 'dashboard' %}">
+            <span class="marca-logo"><i class="fas fa-box"></i></span>
+            <span>
+                Encomiendas
+                <small>Panel de operaciones</small>
+            </span>
         </a>
-        {% if user.is_authenticated %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="menuPrincipal">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link {% if url_actual == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
-                        Dashboard
-                        {# Total de activas (context processor) #}
-                        <span class="badge bg-secondary">{{ nav_activas }}</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if url_actual == 'encomienda_lista' %}active{% endif %}" href="{% url 'encomienda_lista' %}">
-                        Encomiendas
-                        {% if nav_retraso > 0 %}
-                        {# Badge rojo con el número de encomiendas retrasadas #}
-                        <span class="badge bg-danger rounded-pill" data-bs-toggle="tooltip" title="Con retraso">{{ nav_retraso }}</span>
-                        {% endif %}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if url_actual == 'encomienda_crear' %}active{% endif %}" href="{% url 'encomienda_crear' %}">Nueva</a>
-                </li>
-                {% if user.is_staff %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                </li>
-                {% endif %}
-            </ul>
-            <div class="d-flex align-items-center">
-                <a href="{% url 'perfil' %}" class="navbar-text text-white text-decoration-none me-3">
-                    <i class="fas fa-user me-1"></i>{{ user.username }}
-                </a>
-                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
-                    <i class="fas fa-sign-out-alt me-1"></i>Salir
-                </a>
-            </div>
-        </div>
-        {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-light">
-            <i class="fas fa-sign-in-alt me-1"></i>Iniciar sesión
+        <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#menuLateral" aria-label="Cerrar"></button>
+    </div>
+
+    <nav class="menu-cuerpo">
+        <p class="menu-seccion">Operación</p>
+        <a class="menu-link {% if url_actual == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+            <i class="fas fa-gauge"></i> Dashboard
+            {# Total de activas (context processor) #}
+            <span class="menu-contador">{{ nav_activas }}</span>
+        </a>
+        <a class="menu-link {% if url_actual == 'encomienda_lista' or url_actual == 'encomienda_detalle' %}active{% endif %}" href="{% url 'encomienda_lista' %}">
+            <i class="fas fa-boxes-stacked"></i> Encomiendas
+            {% if nav_retraso > 0 %}
+            {# Contador rojo con el número de encomiendas retrasadas #}
+            <span class="menu-contador alerta" data-bs-toggle="tooltip" data-bs-placement="right" title="Con retraso">{{ nav_retraso }}</span>
+            {% endif %}
+        </a>
+        <a class="menu-link {% if url_actual == 'encomienda_crear' %}active{% endif %}" href="{% url 'encomienda_crear' %}">
+            <i class="fas fa-plus"></i> Nueva encomienda
+        </a>
+
+        {% if user.is_staff %}
+        <p class="menu-seccion">Administración</p>
+        <a class="menu-link" href="{% url 'admin:index' %}">
+            <i class="fas fa-sliders"></i> Admin del sitio
         </a>
         {% endif %}
+    </nav>
+
+    <div class="menu-usuario">
+        <a href="{% url 'perfil' %}" class="usuario-info {% if url_actual == 'perfil' %}active{% endif %}">
+            <span class="avatar">{{ user.username|first|upper }}</span>
+            <span>
+                {{ user.get_full_name|default:user.username }}
+                <small>Ver mi perfil</small>
+            </span>
+        </a>
+        <a href="{% url 'logout' %}" class="btn btn-icono" data-bs-toggle="tooltip" title="Cerrar sesión" aria-label="Cerrar sesión">
+            <i class="fas fa-right-from-bracket"></i>
+        </a>
     </div>
-</nav>
+</aside>
 {% endwith %}

@@ -4,158 +4,134 @@
 {% block title %}{{ encomienda.codigo }} — Detalle{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h2 class="h3 mb-0"><i class="fas fa-box me-2"></i>{{ encomienda.codigo }}</h2>
+<a href="{% url 'encomienda_lista' %}" class="volver"><i class="fas fa-chevron-left me-1"></i>Encomiendas</a>
+
+<div class="page-header">
     <div>
-        <a href="{% url 'encomienda_lista' %}" class="btn btn-outline-secondary me-2">Volver</a>
-        {# Solo mostrar si no está entregada ni devuelta #}
-        {% if not encomienda.esta_entregada %}
-        <a href="{% url 'encomienda_editar' encomienda.pk %}" class="btn btn-outline-primary me-2">
-            <i class="fas fa-edit me-1"></i>Editar
-        </a>
-        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEstado">
-            Cambiar estado
-        </button>
-        {% endif %}
+        <h1 class="titulo-codigo">{{ encomienda.codigo }}</h1>
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <span class="badge-estado badge-{{ encomienda.estado }}">{{ encomienda.get_estado_display }}</span>
+            {% if encomienda.tiene_retraso %}<span class="tag-retraso">Retrasada</span>{% endif %}
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
         {% if encomienda.estado == 'PE' %}
-        <a href="{% url 'encomienda_eliminar' encomienda.pk %}" class="btn btn-outline-danger ms-2">
-            <i class="fas fa-trash"></i>
+        <a href="{% url 'encomienda_eliminar' encomienda.pk %}" class="btn btn-outline-danger">
+            <i class="fas fa-trash me-1"></i>Eliminar
         </a>
+        {% endif %}
+        {# Solo mostrar si no está entregada ni cancelada #}
+        {% if not encomienda.esta_entregada %}
+        <a href="{% url 'encomienda_editar' encomienda.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-pen me-1"></i>Editar
+        </a>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEstado">
+            <i class="fas fa-arrows-rotate me-1"></i>Cambiar estado
+        </button>
         {% endif %}
     </div>
 </div>
 
-<div class="row">
+{# Alerta de retraso usando @property del modelo #}
+{% if encomienda.tiene_retraso %}
+<div class="aviso-retraso">
+    <i class="fas fa-clock"></i>
+    <div>
+        <strong>Entrega atrasada.</strong>
+        Debía llegar el {{ encomienda.fecha_entrega_est|date:'d/m/Y' }} y lleva {{ encomienda.dias_en_transito }} días desde su registro.
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
     {# Columna izquierda: datos principales #}
-    <div class="col-md-8">
-        <div class="card shadow mb-4">
-            <div class="card-header bg-white d-flex justify-content-between">
-                <h5 class="mb-0">Información de la encomienda</h5>
-                <span class="badge-estado badge-{{ encomienda.estado }}">{{ encomienda.get_estado_display }}</span>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <p class="text-muted mb-1">Remitente</p>
-                        <h6>{{ encomienda.remitente.nombre_completo }}</h6>
+    <div class="col-lg-8">
+        <section class="panel mb-4">
+            <div class="panel-body">
+                {# Ruta destacada #}
+                <div class="ruta-grande">
+                    <div>
+                        <span class="text-muted small">Origen</span>
+                        <strong>{{ encomienda.ruta.origen }}</strong>
                     </div>
-                    <div class="col-md-6">
-                        <p class="text-muted mb-1">Destinatario</p>
-                        <h6>{{ encomienda.destinatario.nombre_completo }}</h6>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <p class="text-muted mb-1">Ruta</p>
-                        <h6>{{ encomienda.ruta }}</h6>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="text-muted mb-1">Peso</p>
-                        <h6>{{ encomienda.peso_kg|floatformat:1 }} kg</h6>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="text-muted mb-1">Costo</p>
-                        <h6>S/ {{ encomienda.costo_envio|floatformat:2 }}</h6>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-8">
-                        <p class="text-muted mb-1">Descripción</p>
-                        <h6>{{ encomienda.descripcion|truncatechars:80 }}</h6>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="text-muted mb-1">Observaciones</p>
-                        <h6>{{ encomienda.observaciones|default:'—' }}</h6>
+                    <div class="ruta-grande-linea"><i class="fas fa-truck-fast"></i></div>
+                    <div class="text-end">
+                        <span class="text-muted small">Destino</span>
+                        <strong>{{ encomienda.ruta.destino }}</strong>
                     </div>
                 </div>
 
-                {# Alerta de retraso usando @property del modelo #}
-                {% if encomienda.tiene_retraso %}
-                <div class="alert alert-danger mt-3 alerta-fija">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Esta encomienda tiene {{ encomienda.dias_en_transito }} días en tránsito
-                    y superó la fecha de entrega estimada.
-                </div>
-                {% endif %}
+                <dl class="datos">
+                    <div><dt>Remitente</dt><dd>{{ encomienda.remitente.nombre_completo }}</dd></div>
+                    <div><dt>Destinatario</dt><dd>{{ encomienda.destinatario.nombre_completo }}</dd></div>
+                    <div><dt>Peso</dt><dd>{{ encomienda.peso_kg|floatformat:1 }} kg</dd></div>
+                    <div><dt>Volumen</dt><dd>{% if encomienda.volumen_cm3 %}{{ encomienda.volumen_cm3|floatformat:0 }} cm³{% else %}—{% endif %}</dd></div>
+                    <div><dt>Costo del envío</dt><dd>S/ {{ encomienda.costo_envio|floatformat:2 }}</dd></div>
+                    <div><dt>Registrada por</dt><dd>{{ encomienda.empleado_registro|default:'—' }}</dd></div>
+                    <div class="dato-ancho"><dt>Descripción</dt><dd>{{ encomienda.descripcion }}</dd></div>
+                    <div class="dato-ancho"><dt>Observaciones</dt><dd>{{ encomienda.observaciones|default:'—' }}</dd></div>
+                </dl>
             </div>
-        </div>
+        </section>
 
         {# Historial de estados #}
-        <div class="card shadow mb-4">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">Historial de estados <span class="badge bg-secondary">{{ historial|length }}</span></h5>
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Historial</h2>
+                <span class="text-muted small">{{ historial|length }} cambio{{ historial|length|pluralize }}</span>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                <table class="table mb-0">
-                    <thead>
-                        <tr><th>Fecha</th><th>Anterior</th><th>Nuevo</th><th>Empleado</th><th>Observación</th></tr>
-                    </thead>
-                    <tbody>
-                        {% for h in historial %}
-                        <tr>
-                            <td>{{ h.fecha_cambio|date:'d/m/Y H:i' }}</td>
-                            <td><span class="badge-estado badge-{{ h.estado_anterior }}">{{ h.get_estado_anterior_display }}</span></td>
-                            <td><span class="badge-estado badge-{{ h.estado_nuevo }}">{{ h.get_estado_nuevo_display }}</span></td>
-                            <td>{{ h.empleado }}</td>
-                            <td>{{ h.observacion|default:'—' }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5" class="text-center py-3">Sin cambios registrados</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
+            <div class="panel-body">
+                <ol class="timeline">
+                    {% for h in historial %}
+                    <li class="timeline-item punto-{{ h.estado_nuevo }}">
+                        <div class="timeline-titulo">
+                            Pasó a <span class="badge-estado badge-{{ h.estado_nuevo }}">{{ h.get_estado_nuevo_display }}</span>
+                            <span class="text-muted">desde {{ h.get_estado_anterior_display|lower }}</span>
+                        </div>
+                        <p class="timeline-meta">{{ h.fecha_cambio|date:'d/m/Y, H:i' }} · {{ h.empleado }}</p>
+                        {% if h.observacion %}<p class="timeline-nota">{{ h.observacion }}</p>{% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="vacio">Aún no hay cambios de estado. El primero aparecerá aquí.</li>
+                    {% endfor %}
+                </ol>
             </div>
-        </div>
+        </section>
     </div>
 
     {# Columna derecha: fechas #}
-    <div class="col-md-4">
-        <div class="card shadow mb-4">
-            <div class="card-header bg-white"><h5 class="mb-0">Fechas</h5></div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Registro</span><strong>{{ encomienda.fecha_registro|date:'d/m/Y H:i' }}</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Entrega estimada</span><strong>{{ encomienda.fecha_entrega_est|date:'d/m/Y'|default:'—' }}</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Entrega real</span><strong>{{ encomienda.fecha_entrega_real|date:'d/m/Y'|default:'—' }}</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Días desde el registro</span><strong>{{ encomienda.dias_en_transito }}</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">¿Finalizada?</span><strong>{{ encomienda.esta_entregada|yesno:'Sí,No' }}</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Registrada por</span><strong>{{ encomienda.empleado_registro|default:'—' }}</strong>
-                </li>
+    <div class="col-lg-4">
+        <section class="panel">
+            <div class="panel-header"><h2>Fechas</h2></div>
+            <ul class="lista-datos">
+                <li><span>Registro</span><strong>{{ encomienda.fecha_registro|date:'d/m/Y H:i' }}</strong></li>
+                <li><span>Entrega estimada</span><strong>{{ encomienda.fecha_entrega_est|date:'d/m/Y'|default:'—' }}</strong></li>
+                <li><span>Entrega real</span><strong>{{ encomienda.fecha_entrega_real|date:'d/m/Y'|default:'—' }}</strong></li>
+                <li><span>Días desde el registro</span><strong>{{ encomienda.dias_en_transito }}</strong></li>
+                <li><span>¿Finalizada?</span><strong>{{ encomienda.esta_entregada|yesno:'Sí,No' }}</strong></li>
             </ul>
-            <div class="card-footer bg-white small">
-                <a href="{% url 'encomienda_estado_json' encomienda.pk %}" target="_blank">
+            <div class="panel-footer">
+                <a href="{% url 'encomienda_estado_json' encomienda.pk %}" target="_blank" class="link-suave small">
                     <i class="fas fa-code me-1"></i>Ver estado en JSON
                 </a>
             </div>
-        </div>
+        </section>
     </div>
 </div>
 
 {# Modal para cambiar el estado (envía POST) #}
 {% if not encomienda.esta_entregada %}
 <div class="modal fade" id="modalEstado" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <form method="post" action="{% url 'encomienda_cambiar_estado' encomienda.pk %}" class="modal-content">
             {% csrf_token %}
             <div class="modal-header">
                 <h5 class="modal-title">Cambiar estado de {{ encomienda.codigo }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">Nuevo estado</label>
+                    <label class="form-label" for="selectEstado">Nuevo estado</label>
                     <select name="estado" id="selectEstado" class="form-select" required>
                         <option value="{{ encomienda.estado }}" disabled>{{ encomienda.get_estado_display }} (actual)</option>
                         {% for valor, etiqueta in encomienda.estados_siguientes %}
@@ -164,13 +140,13 @@
                     </select>
                 </div>
                 <div>
-                    <label class="form-label">Observación</label>
-                    <textarea name="observacion" class="form-control" rows="2"></textarea>
+                    <label class="form-label" for="observacion">Observación <span class="text-muted">(opcional)</span></label>
+                    <textarea name="observacion" id="observacion" class="form-control" rows="2" placeholder="Ej.: salió en el bus de las 8:00"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-warning">Guardar</button>
+                <button type="submit" class="btn btn-primary">Guardar estado</button>
             </div>
         </form>
     </div>

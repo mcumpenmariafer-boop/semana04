@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -20,6 +20,20 @@ from .models import Empleado, Encomienda
 def dashboard(request):
     """Vista principal del sistema con estadísticas"""
     hoy = timezone.localdate()
+
+    # Cantidad de encomiendas por estado (para las barras del dashboard)
+    total = Encomienda.objects.count()
+    conteo = dict(Encomienda.objects.values_list('estado').annotate(n=Count('id')))
+    por_estado = [
+        {
+            'codigo': valor,
+            'nombre': etiqueta,
+            'total': conteo.get(valor, 0),
+            'porcentaje': round(conteo.get(valor, 0) * 100 / total) if total else 0,
+        }
+        for valor, etiqueta in EstadoEnvio.choices
+    ]
+
     context = {
         'total_activas': Encomienda.objects.activas().count(),
         'en_transito': Encomienda.objects.en_transito().count(),
@@ -27,7 +41,9 @@ def dashboard(request):
         'entregadas_hoy': Encomienda.objects.filter(
             estado=EstadoEnvio.ENTREGADO,
             fecha_entrega_real=hoy).count(),
-        'ultimas': Encomienda.objects.con_relaciones()[:5],
+        'ultimas': Encomienda.objects.con_relaciones()[:6],
+        'por_estado': por_estado,
+        'total_encomiendas': total,
     }
     return render(request, 'envios/dashboard.html', context)
 

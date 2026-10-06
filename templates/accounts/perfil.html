@@ -4,30 +4,35 @@
 {% block title %}Mi perfil — Encomiendas{% endblock %}
 
 {% block content %}
-<h2 class="h3 mb-4"><i class="fas fa-id-badge me-2"></i>Mi perfil</h2>
-<div class="row">
+<div class="perfil-cabecera">
+    <span class="avatar grande">{{ user.username|first|upper }}</span>
+    <div>
+        <h1>{{ user.get_full_name|default:user.username }}</h1>
+        <p class="page-sub mb-0">{{ empleado.get_cargo_display }} · {{ empleado.codigo }}</p>
+    </div>
+</div>
+
+<div class="row g-4">
     <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header bg-white"><h5 class="mb-0">Usuario del sistema</h5></div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Usuario</span><strong>{{ user.username }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Nombre</span><strong>{{ user.get_full_name|default:'—' }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Email</span><strong>{{ user.email|default:'—' }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Administrador</span><strong>{{ user.is_staff|yesno:'Sí,No' }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Último acceso</span><strong>{{ user.last_login|date:'d/m/Y H:i' }}</strong></li>
+        <section class="panel">
+            <div class="panel-header"><h2>Cuenta</h2></div>
+            <ul class="lista-datos">
+                <li><span>Usuario</span><strong>{{ user.username }}</strong></li>
+                <li><span>Correo</span><strong>{{ user.email|default:'—' }}</strong></li>
+                <li><span>Administrador</span><strong>{{ user.is_staff|yesno:'Sí,No' }}</strong></li>
+                <li><span>Último acceso</span><strong>{{ user.last_login|date:'d/m/Y H:i' }}</strong></li>
             </ul>
-        </div>
+        </section>
     </div>
     <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header bg-white"><h5 class="mb-0">Datos del empleado</h5></div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Código</span><strong>{{ empleado.codigo }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Cargo</span><strong>{{ empleado.get_cargo_display }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Encomiendas registradas</span><strong>{{ registradas }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Tu sesión expira</span><strong>{{ sesion_expira|date:'d/m/Y H:i' }}</strong></li>
+        <section class="panel">
+            <div class="panel-header"><h2>Actividad</h2></div>
+            <ul class="lista-datos">
+                <li><span>Encomiendas registradas</span><strong>{{ registradas }}</strong></li>
+                <li><span>Cargo</span><strong>{{ empleado.get_cargo_display }}</strong></li>
+                <li><span>Tu sesión expira</span><strong>{{ sesion_expira|date:'d/m/Y H:i' }}</strong></li>
             </ul>
-        </div>
+        </section>
     </div>
 </div>
 {% endblock %}

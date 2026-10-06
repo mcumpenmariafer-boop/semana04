@@ -4,54 +4,82 @@
 {% block title %}Dashboard — Encomiendas{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="h3"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
-        <p class="text-muted mb-0">Hola {{ user.get_full_name|default:user.username }}, hoy es {% now "l d \d\e F \d\e Y" %}.</p>
+<div class="page-header">
+    <div>
+        <h1>Hola, {{ user.first_name|default:user.username }}</h1>
+        <p class="page-sub">Así van los envíos hoy, {% now "l j \d\e F" %}.</p>
     </div>
+    <a href="{% url 'encomienda_crear' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Registrar encomienda
+    </a>
 </div>
 
 <!-- Tarjetas de estadísticas (partial reutilizado con include ... with) -->
-<div class="row mb-4">
+<div class="row g-3 mb-4">
     {% include 'partials/stat_card.html' with label='Activas' valor=total_activas icono='boxes-stacked' tono='activas' %}
     {% include 'partials/stat_card.html' with label='En tránsito' valor=en_transito icono='truck-fast' tono='transito' %}
-    {% include 'partials/stat_card.html' with label='Con retraso' valor=con_retraso icono='exclamation-triangle' tono='retraso' %}
-    {% include 'partials/stat_card.html' with label='Entregadas hoy' valor=entregadas_hoy icono='check-circle' tono='entregadas' %}
+    {% include 'partials/stat_card.html' with label='Con retraso' valor=con_retraso icono='clock' tono='retraso' %}
+    {% include 'partials/stat_card.html' with label='Entregadas hoy' valor=entregadas_hoy icono='circle-check' tono='entregadas' %}
 </div>
 
-<!-- Últimas encomiendas -->
-<div class="card shadow">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Últimas encomiendas registradas</h5>
-        <a href="{% url 'encomienda_lista' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+<div class="row g-4">
+    <!-- Últimas encomiendas -->
+    <div class="col-xl-8">
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Últimas encomiendas</h2>
+                <a href="{% url 'encomienda_lista' %}" class="link-suave">Ver todas</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover tabla">
+                    <thead>
+                        <tr><th>Código</th><th>Remitente</th><th>Ruta</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for enc in ultimas %}
+                        <tr class="fila-link" data-href="{% url 'encomienda_detalle' enc.pk %}">
+                            <td><a href="{% url 'encomienda_detalle' enc.pk %}" class="codigo">{{ enc.codigo }}</a></td>
+                            <td>{{ enc.remitente.nombre_completo }}</td>
+                            <td>
+                                <span class="ruta">
+                                    <span>{{ enc.ruta.origen }}</span><span class="ruta-linea"></span><span>{{ enc.ruta.destino }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-estado badge-{{ enc.estado }}">{{ enc.get_estado_display }}</span>
+                                {% if enc.tiene_retraso %}<span class="tag-retraso">Retrasada</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="vacio">Todavía no hay encomiendas. <a href="{% url 'encomienda_crear' %}">Registra la primera</a>.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Código</th><th>Remitente</th>
-                    <th>Destino</th><th>Estado</th><th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for enc in ultimas %}
-                <tr class="fila-link" data-href="{% url 'encomienda_detalle' enc.pk %}">
-                    <td><code>{{ enc.codigo }}</code></td>
-                    <td>{{ enc.remitente.nombre_completo }}</td>
-                    <td>{{ enc.ruta.destino }}</td>
-                    <td>
-                        <span class="badge-estado badge-{{ enc.estado }}">{{ enc.get_estado_display }}</span>
-                        {% if enc.tiene_retraso %}<span class="tag-retraso">Retrasada</span>{% endif %}
-                    </td>
-                    <td><a href="{% url 'encomienda_detalle' enc.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center py-3">No hay encomiendas</td></tr>
+
+    <!-- Distribución por estado -->
+    <div class="col-xl-4">
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Por estado</h2>
+                <span class="text-muted small">{{ total_encomiendas }} en total</span>
+            </div>
+            <div class="panel-body">
+                {% for e in por_estado %}
+                <a class="barra-estado" href="{% url 'encomienda_lista' %}?estado={{ e.codigo }}">
+                    <div class="barra-texto">
+                        <span class="badge-estado badge-{{ e.codigo }}">{{ e.nombre }}</span>
+                        <strong>{{ e.total }}</strong>
+                    </div>
+                    <div class="barra-fondo">
+                        <div class="barra-relleno relleno-{{ e.codigo }}" data-porcentaje="{{ e.porcentaje }}"></div>
+                    </div>
+                </a>
                 {% endfor %}
-            </tbody>
-        </table>
-        </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}

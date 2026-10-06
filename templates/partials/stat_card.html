@@ -1,14 +1,12 @@
 {# templates/partials/stat_card.html — tarjeta de estadística reutilizable #}
-<div class="col-md-3 col-sm-6">
-    <div class="card stat-card mb-3">
-        <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-                <p class="stat-label mb-1">{{ label }}</p>
-                <p class="stat-valor mb-0">{{ valor }}</p>
-            </div>
-            <div class="stat-icono stat-{{ tono }}">
-                <i class="fas fa-{{ icono }}"></i>
-            </div>
+<div class="col-6 col-xl-3">
+    <div class="stat-card">
+        <div class="stat-icono stat-{{ tono }}">
+            <i class="fas fa-{{ icono }}"></i>
+        </div>
+        <div>
+            <p class="stat-valor">{{ valor }}</p>
+            <p class="stat-label">{{ label }}</p>
         </div>
     </div>
 </div>

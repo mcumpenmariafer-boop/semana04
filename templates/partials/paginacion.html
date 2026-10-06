@@ -1,14 +1,14 @@
 {# templates/partials/paginacion.html — paginación reutilizable que conserva los filtros #}
 {% if page_obj.has_other_pages %}
 <nav aria-label="Paginación">
-    <ul class="pagination justify-content-center mb-0">
+    <ul class="pagination mb-0">
         {# Botón anterior #}
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&estado={{ estado_activo }}">&laquo; Anterior</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&estado={{ estado_activo }}" aria-label="Anterior"><i class="fas fa-chevron-left"></i></a>
         </li>
         {% else %}
-        <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+        <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>
         {% endif %}
 
         {# Números de página #}
@@ -21,10 +21,10 @@
         {# Botón siguiente #}
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&estado={{ estado_activo }}">Siguiente &raquo;</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&estado={{ estado_activo }}" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></a>
         </li>
         {% else %}
-        <li class="page-item disabled"><span class="page-link">Siguiente &raquo;</span></li>
+        <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>
         {% endif %}
     </ul>
 </nav>

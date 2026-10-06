@@ -1,44 +1,40 @@
 {# templates/accounts/login.html #}
 {% extends 'base.html' %}
 
-{% block title %}Iniciar Sesión — Encomiendas{% endblock %}
+{% block title %}Iniciar sesión — Encomiendas{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="text-center mb-4">
-            <i class="fas fa-box-open fa-4x text-primary mb-3"></i>
-            <h2>Sistema de Encomiendas</h2>
-            <p class="text-muted">Ingresa tus credenciales para continuar</p>
-        </div>
-        <div class="card shadow">
-            <div class="card-body p-4">
-                <form method="post" action="{% url 'login' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Usuario</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text" name="username" class="form-control" placeholder="Tu usuario"
-                                   value="{{ form.username.value|default:'' }}" required autofocus>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Contraseña</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" name="password" class="form-control" placeholder="Tu contraseña" required>
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
-                        </button>
-                    </div>
-                    <input type="hidden" name="next" value="{{ next }}">
-                </form>
+<div class="login">
+    <div class="login-lado">
+        <span class="marca-logo grande"><i class="fas fa-box"></i></span>
+        <h1>Sistema de Gestión de Encomiendas</h1>
+        <p>Registra envíos, sigue cada paquete por su ruta y entérate a tiempo de los que van atrasados.</p>
+        <ul>
+            <li><i class="fas fa-check"></i> Estado de cada encomienda en tiempo real</li>
+            <li><i class="fas fa-check"></i> Historial de cambios por empleado</li>
+            <li><i class="fas fa-check"></i> Alertas de entregas retrasadas</li>
+        </ul>
+    </div>
+
+    <div class="login-form">
+        <h2>Inicia sesión</h2>
+        <p class="text-muted mb-4">Usa tu usuario de empleado.</p>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label" for="username">Usuario</label>
+                <input type="text" id="username" name="username" class="form-control form-control-lg"
+                       value="{{ form.username.value|default:'' }}" required autofocus autocomplete="username">
             </div>
-        </div>
+            <div class="mb-4">
+                <label class="form-label" for="password">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-control form-control-lg"
+                       required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">Iniciar sesión</button>
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
     </div>
 </div>
 {% endblock %}
